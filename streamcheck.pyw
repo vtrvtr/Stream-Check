@@ -27,7 +27,7 @@ try:
     logging.getLogger("requests").setLevel(logging.WARNING)
     browser = webbrowser.get('windows-default')
 except ParsingError as e:
-    print(e)
+    print("Couldn't parse: {}".format(e))
 
 
 def open_dict():

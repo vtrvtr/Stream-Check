@@ -70,8 +70,16 @@ def open_livestreamer(stream_urls, quality, verbose, chat, monitor):
             if chat:
                 webbrowser.open_new_tab(
                     '{}/{}'.format(str(stream_url), 'chat'))
-            Popen(
-                'livestreamer {} {} -Q'.format(str(stream_url), quality), shell=verbose)
+
+            #vod mode, makes possible to skip the time
+            try:
+                int(str(stream_url).split('/')[-1]) 
+                Popen(
+                    'livestreamer {} {} -Q --player-passthrough=hls'.format(str(stream_url), quality), shell=verbose)
+            #normal mode
+            except ValueError: 
+                Popen(
+                    'livestreamer {} {} -Q '.format(str(stream_url), quality), shell=verbose)
 
             logging.info('Opening: {} \n Quality: {} \n verbose: {}'.format(
                 stream_url, quality, verbose))
@@ -131,5 +139,3 @@ if __name__ == "__main__":
         add_streams(args.add[0], args.add[1])
     else:
         main()
-
-

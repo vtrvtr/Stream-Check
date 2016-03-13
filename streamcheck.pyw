@@ -64,20 +64,26 @@ def check_stream(url):
             logging.error('Couldnt open: {}'.format(url))
 
 
+def check_vod(url):
+    if '?t=' in url:
+        return True
+    try:
+        int(str(url).split('/')[-1])
+    except ValueError:
+        return False
+    return True
+
+
 def open_livestreamer(stream_urls, quality, verbose, chat, monitor):
     for stream_url in stream_urls:
         if check_stream(stream_url):
             if chat:
                 webbrowser.open_new_tab(
                     '{}/{}'.format(str(stream_url), 'chat'))
-
-            #vod mode, makes possible to skip the time
-            try:
-                int(str(stream_url).split('/')[-1]) 
+            if check_vod(stream_url):
                 Popen(
                     'livestreamer {} {} -Q --player-passthrough=hls'.format(str(stream_url), quality), shell=verbose)
-            #normal mode
-            except ValueError: 
+            else:
                 Popen(
                     'livestreamer {} {} -Q '.format(str(stream_url), quality), shell=verbose)
 
@@ -115,8 +121,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Game streams to open')
     parser.add_argument(
         '--single', '-s', help='opens a single stream', action="store")
-    parser.add_argument( 
-        '--multi', '-m',  help="open multiple streams", nargs='*', action="store")
+    parser.add_argument(
+        '--multi', '-m', help="open multiple streams", nargs='*', action="store")
     parser.add_argument(
         '--add', '-a', help="add stream to the list URL GAME", nargs=2, action="store")
     parser.add_argument(

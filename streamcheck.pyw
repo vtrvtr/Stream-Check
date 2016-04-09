@@ -63,7 +63,6 @@ def check_stream(url):
         else:
             logging.error('Couldnt open: {}'.format(url))
 
-
 def check_vod(url):
     if '?t=' in url:
         return True
@@ -94,7 +93,6 @@ def open_livestreamer(stream_urls, quality, verbose, chat, monitor):
             windows = WindowsPosition()
             windows.move(monitor)
 
-
 def massive_add(text):
     with open(text, 'r') as f:
         lines = [line.strip() for line in f.readlines()]
@@ -106,7 +104,7 @@ def massive_add(text):
                 add_streams(''.join(url[1::3]), game)
 
 
-def main(game=None, quality='source', verbose=True, chat=False, monitor='monitor1'):
+def main(game=None, quality='source', verbose=True, chat=False, monitor='monitor2'):
     streams = open_dict()
     if game == None:
         for stream in streams:
@@ -132,7 +130,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '--quality', '-q', help='Chooses the quality to open streams, default = source', default='source')
     parser.add_argument(
-        '--monitor', '-mn', help='Chooses the monitor to open, default = monitor1, n (see movewindows.py)', default='monitor1', action="store")
+        '--monitor', '-mn', help='Chooses the monitor to open, default = monitor2, n (see movewindows.py)', default='monitor2', action="store")
     args = parser.parse_args()
     verbose = False if args.verbose else True
     chat = True if args.chat else False

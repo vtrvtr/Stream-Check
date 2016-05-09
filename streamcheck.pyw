@@ -63,6 +63,7 @@ def check_stream(url):
         else:
             logging.error('Couldnt open: {}'.format(url))
 
+
 def check_vod(url):
     if '?t=' in url:
         return True
@@ -93,6 +94,7 @@ def open_livestreamer(stream_urls, quality, verbose, chat, monitor):
             windows = WindowsPosition()
             windows.move(monitor)
 
+
 def massive_add(text):
     with open(text, 'r') as f:
         lines = [line.strip() for line in f.readlines()]
@@ -118,11 +120,11 @@ def main(game=None, quality='source', verbose=True, chat=False, monitor='monitor
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Game streams to open')
     parser.add_argument(
-        '--single', '-s', help='opens a single stream', action="store")
+        '--single', '-s', help='opens a single stream. Use "-s URL -a CATEGORY" to add stream to dictionary', action="store")
     parser.add_argument(
         '--multi', '-m', help="open multiple streams", nargs='*', action="store")
     parser.add_argument(
-        '--add', '-a', help="add stream to the list URL GAME", nargs=2, action="store")
+        '--add', '-a', help="add stream to the list. Use '-a URL GAME'", action="store")
     parser.add_argument(
         '-v', '--verbose', help="Makes cmd windows appear", action="store_true")
     parser.add_argument(
@@ -137,6 +139,8 @@ if __name__ == "__main__":
     if args.single:
         open_livestreamer(
             [args.single], args.quality, verbose, chat, args.monitor)
+        if args.add:
+            add_streams(args.single, args.add)
     elif args.multi:
         main(args.multi, args.quality, verbose, chat, args.monitor)
     elif args.add:

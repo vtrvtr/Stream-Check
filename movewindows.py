@@ -1,5 +1,6 @@
-import pywinauto
+import time
 import warnings
+import pywinauto
 
 
 class WindowsPosition():
@@ -12,11 +13,11 @@ class WindowsPosition():
             self.y_pos = self.app.Rectangle().top
             self.x_pos = self.app.Rectangle().left
             self.width = self.app.Rectangle().width()
-            self.height =self.app.Rectangle().height()
+            self.height = self.app.Rectangle().height()
         except IndexError:
             warnings.warn('App not find')
 
-    def move(self, monitor='monitor1', new_width=1920, new_height=1080):
+    def move(self, monitor='monitor1', new_width=1920, new_height=1080, move_attemps=3):
         '''monitor to send the window to (def: monitor1)
                 monitor1 -> up
                 monitor2 -> down
@@ -24,9 +25,15 @@ class WindowsPosition():
             height of the windows (def: 1080)'''
         monitors_pos = {'monitor1': -1080, 'monitor2': 0}
         try:
-            self.app.MoveWindow(x=0, y=monitors_pos[monitor], width=new_width, height=new_height)
+            self.app.MoveWindow(x=0, y=monitors_pos[
+                                monitor], width=new_width, height=new_height)
         except AttributeError:
-            warnings.warn('No windows to move')
+            warnings.warn(
+                'No windows to move. Trying {} more times.'.format(move_attemps))
+            while move_attemps != 0:
+                self.app.MoveWindow(x=0, y=monitors_pos[monitor], width=new_width, height=new_height)
+                move_attemps = move_attemps - 1
+                time.sleep(1)
 
     def toggle_visibility(app, action='minimize'):
         '''Minimizes or maximizes windows (def: minimize)

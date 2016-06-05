@@ -1,30 +1,31 @@
 #!python2
 
-import argparse
-import logging
-from subprocess import Popen
 import json
-from livestreamer import streams as livestreamer_stream
-from stream_lib import Streams
-from configparser import SafeConfigParser, ParsingError
-from shutil import copy
-import webbrowser
-from movewindows import WindowsPosition
 import time
+import logging
+import argparse
+import webbrowser
+from shutil import copy
+from subprocess import Popen
+from stream_lib import Streams
+from urllib2 import urlopen
+from movewindows import WindowsPosition
+from configparser import SafeConfigParser, ParsingError
+from livestreamer import streams as livestreamer_stream
 
 
 # Reading and loading configs
 try:
     conf = SafeConfigParser()
-    conf.read('E:\code\stream-check\config.ini')
+    conf.read('E:\Code\Stream-Check\config.ini')
     STREAM_LIST_PATH = conf.get('stream_dict', 'path')
     STREAM_BACKUP_PATH = conf.get('stream_dict', 'backup')
     TEXT_PATH = conf.get('massiveadd', 'path')
     LOG_PATH = conf.get('log', 'path')
     FORMATTER = '%(asctime)-15s | %(levelname)-8s \n %(message)-8s'
-    logging.basicConfig(
-        filename=LOG_PATH, level=logging.INFO, format=FORMATTER)
-    logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.basicConfig(filename="lmao.log",
+                        level=logging.DEBUG, format=FORMATTER)
+    # logging.getLogger("stream_check").setLevel(logging.WARNING)
     browser = webbrowser.get('windows-default')
 except ParsingError as e:
     print("Couldn't parse because {}".format(e))
@@ -51,12 +52,16 @@ def add_streams(url, game):
         logging.info('Added url: {} \n category: {}'.format(url, game))
 
 
-def check_stream(url):
+def check_stream(user):
+    if "/" in user:
+        user = user.split('/')[1]
+    url = 'https://api.twitch.tv/kraken/streams/{}'.format(user)
     try:
-        if livestreamer_stream(url):
-            return True
-        else:
+        info = json.loads(urlopen(url, timeout=5).read().decode('utf-8'))
+        if info['stream'] == None:
             return False
+        else:
+            return True
     except Exception as e:
         if args.verbose:
             logging.error('Couldnt open: {} ({})'.format(url, e))
@@ -76,7 +81,7 @@ def check_vod(url):
 
 def open_livestreamer(stream_urls, quality, verbose, chat, monitor):
     for stream_url in stream_urls:
-        if check_stream(stream_url):
+        if check_stream(stream_url) or check_vod(stream_url):
             if chat:
                 webbrowser.open_new_tab(
                     '{}/{}'.format(str(stream_url), 'chat'))
@@ -90,7 +95,6 @@ def open_livestreamer(stream_urls, quality, verbose, chat, monitor):
             logging.info('Opening: {} \n Quality: {} \n verbose: {}'.format(
                 stream_url, quality, verbose))
 
-            time.sleep(16)
             windows = WindowsPosition()
             windows.move(monitor)
 
